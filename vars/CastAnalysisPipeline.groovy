@@ -7,8 +7,10 @@ def call (Map config){
 	           git branch: 'master', credentialsId: 'Github-prabinovich', url: 'https://github.com/prabinovich/CAST-Jenkins-Pipeline.git'
 	        }
 	        dir('App-Code') {
-	           git credentialsId: 'Github-prabinovich', url: ${config.appGitUrl}
+	           git credentialsId: 'Github-prabinovich', url: '${config.appGitUrl}'
 	        }
+	        
+	        // Map logical drive that will be used for this job
 	        bat 'subst z: "%WORKSPACE%"'
 	    }
 	    
