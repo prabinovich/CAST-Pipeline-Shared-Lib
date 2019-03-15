@@ -6,7 +6,7 @@ def call (Map config){
 	        dir('CAST-Scripts') {
 	           git branch: 'master', credentialsId: 'Github-prabinovich', url: 'https://github.com/prabinovich/CAST-Jenkins-Pipeline.git'
 	        }
-	        dir('Webstore') {
+	        dir('App-Code') {
 	           git credentialsId: 'Github-prabinovich', url: 'https://github.com/prabinovich/WebStore.git'
 	        } 
 	    }
@@ -14,7 +14,7 @@ def call (Map config){
 	    stage ('CAST-Assessment Model') {
 	    	try {
 	        	echo '-- Enable Assessment Model --'
-	        	bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_ImportAssessmentModel.bat" "profile=sandbox838" "app=Webstore" "filepath=%WORKSPACE%\\CAST-Scripts\\QualityModels\\CAST 8.3.8 Assessment Model - Standard.pmx"'
+	        	bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_ImportAssessmentModel.bat" "profile=sandbox838" "app=${config.appname}" "filepath=%WORKSPACE%\\CAST-Scripts\\QualityModels\\CAST 8.3.8 Assessment Model - Standard.pmx"'
 	    	}
 	    	catch (err) {
 	    		echo '*** Assessment model import failed ***'
@@ -25,17 +25,17 @@ def call (Map config){
 	    
 	    stage ('CAST-Packaging') {
 	        echo '-- Packaging and Delivery of Source Code --'
-	        bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_AutomateDelivery.bat" "profile=sandbox838" "app=Webstore" "fromVersion=Baseline" "version=version %BUILD_NUMBER%"'
+	        bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_AutomateDelivery.bat" "profile=sandbox838" "app=${config.appname}" "fromVersion=Baseline" "version=version %BUILD_NUMBER%"'
 	    } 
 	    
 	    stage ('CAST-Analysis') {
 	        echo '-- Analyze Application --'
-	        bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_Analyze.bat" "profile=sandbox838" "app=Webstore"'
+	        bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_Analyze.bat" "profile=sandbox838" "app=${config.appname}"'
 	    }
 	    
 	    stage ('CAST-Snapshot') {
 	        echo '-- Generate Snapshot --'
-	        bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_GenerateSnapshot.bat" "profile=sandbox838" "app=Webstore" "version=version %BUILD_NUMBER%"'
+	        bat '"%WORKSPACE%\\CAST-Scripts\\CLI-Scripts\\CMS_GenerateSnapshot.bat" "profile=sandbox838" "app=${config.appname}" "version=version %BUILD_NUMBER%"'
 	    }
 	    
 	    stage('CAST-Publish Results'){
@@ -53,7 +53,7 @@ def call (Map config){
 	 		echo "-- Create CAST Report in Jenkins --"    
 	    	dir('CAST-Report') {
 	    		withCredentials([usernamePassword(credentialsId: 'CAST-Dashboard-Keys', passwordVariable: 'PWD1', usernameVariable: 'USR1')]) {
-	    			bat 'python "%WORKSPACE%\\CAST-Scripts\\RestAPI\\CAST-Results-Report.py" --connection=http://localhost:8080/CAST-Health-Engineering-838/rest --username=%USR1% --password=%PWD1% --appname=Webstore'
+	    			bat 'python "%WORKSPACE%\\CAST-Scripts\\RestAPI\\CAST-Results-Report.py" --connection=http://localhost:8080/CAST-Health-Engineering-838/rest --username=%USR1% --password=%PWD1% --appname=${config.appname}'
 	    		}
 	    	}
 	    		publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'CAST-Report', reportFiles: 'index.html', reportName: 'CAST Analysis Report', reportTitles: ''])
@@ -62,7 +62,7 @@ def call (Map config){
 	    stage('CAST-Check Success'){
 	    	echo "-- Quality Gate - Check Analysis Results --"
 	    	withCredentials([usernamePassword(credentialsId: 'CAST-Dashboard-Keys', passwordVariable: 'PWD1', usernameVariable: 'USR1')]) {
-	    		bat 'python "%WORKSPACE%\\CAST-Scripts\\RestAPI\\CAST-Check-Rule.py" --connection=http://localhost:8080/CAST-Health-Engineering-838/rest --username=%USR1% --password=%PWD1% --appname=Webstore --ruleid=7742'
+	    		bat 'python "%WORKSPACE%\\CAST-Scripts\\RestAPI\\CAST-Check-Rule.py" --connection=http://localhost:8080/CAST-Health-Engineering-838/rest --username=%USR1% --password=%PWD1% --appname=${config.appname} --ruleid=7742'
 	    	}
 	    }
 	}
