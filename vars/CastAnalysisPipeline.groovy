@@ -17,7 +17,7 @@ def call (Map config){
 	    stage ('CAST-Assessment Model') {
 	    	try {
 	        	echo '-- Enable Assessment Model --'
-	        	bat '"z:\\CAST-Scripts\\CLI-Scripts\\CMS_ImportAssessmentModel.bat" "profile=%config.cmsprofile%" "app=%config.appname%" "filepath=%WORKSPACE%\\CAST-Scripts\\QualityModels\\CAST 8.3.8 Assessment Model - Standard.pmx"'
+	        	bat "'z:\\CAST-Scripts\\CLI-Scripts\\CMS_ImportAssessmentModel.bat' 'profile=%config.cmsprofile%' 'app=%config.appname%' 'filepath=%WORKSPACE%\\CAST-Scripts\\QualityModels\\CAST 8.3.8 Assessment Model - Standard.pmx'"
 	    	}
 	    	catch (err) {
 	    		echo '*** Assessment model import failed ***'
