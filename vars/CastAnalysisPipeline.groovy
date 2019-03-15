@@ -9,9 +9,6 @@ def call (Map config){
 	        dir('App-Code') {
 	           git credentialsId: 'Github-prabinovich', url: "${config.appgiturl}"
 	        }
-	        
-	        // Map logical drive that will be used for this job
-	        bat 'subst z: "%WORKSPACE%"'
 	    }
 	    
 	    stage ('CAST-Assessment Model') {
