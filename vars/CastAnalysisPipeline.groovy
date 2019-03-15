@@ -1,4 +1,4 @@
-// vars/buildPlugin.groovy
+// vars/CastAnalyisPipeline.groovy
 def call (Map config){
 
 	node ('master') {
